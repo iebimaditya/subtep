@@ -66,5 +66,17 @@ export const verificationResponseSchema = createResponseSchema(
   })
 );
 
+export const getQuotaResponseSchema = createResponseSchema(
+  z.object({
+    quotaRemaining: z.object({
+      daily: z.number(),
+      monthly: z.number(),
+      all: z.number(),
+      family: z.number(),
+    }),
+  })
+);
+
 export type LoginResponse = z.infer<typeof loginResponseSchema>;
 export type VerificationResponse = z.infer<typeof verificationResponseSchema>;
+export type GetQuotaResponse = z.infer<typeof getQuotaResponseSchema>;

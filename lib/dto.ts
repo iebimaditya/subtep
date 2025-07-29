@@ -1,4 +1,8 @@
-import { LoginResponse, VerificationResponse } from "./my-pertamina/schema";
+import {
+  GetQuotaResponse,
+  LoginResponse,
+  VerificationResponse,
+} from "./my-pertamina/schema";
 
 export function loginResponseToAccessToken({ data }: LoginResponse) {
   return data.accessToken;
@@ -17,4 +21,8 @@ export function verificationResponseToCustomer(
     phoneNumber: data.phoneNumber,
     types: data.customerTypes.map((customerType) => customerType.name),
   };
+}
+
+export function getQuotaResponseToQuota({ data }: GetQuotaResponse) {
+  return data.quotaRemaining.daily;
 }

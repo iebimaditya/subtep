@@ -19,7 +19,7 @@ async function secretPOST(req: NextRequest) {
 
   if (parsedReqBody.error) {
     return new Response(
-      JSON.stringify({ error: parsedReqBody.error.issues[0] }),
+      JSON.stringify({ error: parsedReqBody.error.issues[0].message }),
       {
         status: 400,
         headers: {
@@ -53,7 +53,7 @@ async function secretPOST(req: NextRequest) {
 
   if (parsedResBody.error) {
     return new Response(
-      JSON.stringify({ error: parsedResBody.error.issues[0] }),
+      JSON.stringify({ error: parsedResBody.error.issues[0].message }),
       {
         status: 500,
         headers: {
