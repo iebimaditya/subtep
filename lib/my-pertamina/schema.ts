@@ -1,5 +1,7 @@
 import z from "zod/v4";
 
+import { customerTypeSchema as customerTypeNameSchema } from "../schema";
+
 export const baseResponseSchema = z.object({
   success: z.boolean(),
   message: z.string(),
@@ -34,7 +36,7 @@ export const loginResponseSchema = createResponseSchema(
 );
 
 const customerTypeSchema = z.object({
-  name: z.string(),
+  name: customerTypeNameSchema,
   sourceTypeId: z.number(),
   status: z.number(),
   verifications: z.array(z.unknown()),
@@ -44,7 +46,7 @@ const customerTypeSchema = z.object({
   registeredAt: z.string(),
 });
 
-export const verificationResponseSchema = createResponseSchema(
+export const verifyCustomerResponseSchema = createResponseSchema(
   z.object({
     nationalityId: z.string(),
     familyId: z.string(),
@@ -78,5 +80,7 @@ export const getQuotaResponseSchema = createResponseSchema(
 );
 
 export type LoginResponse = z.infer<typeof loginResponseSchema>;
-export type VerificationResponse = z.infer<typeof verificationResponseSchema>;
+export type VerifyCustomerResponse = z.infer<
+  typeof verifyCustomerResponseSchema
+>;
 export type GetQuotaResponse = z.infer<typeof getQuotaResponseSchema>;

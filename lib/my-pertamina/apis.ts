@@ -1,4 +1,5 @@
 import { MY_PERTAMINA_ENDPOINT } from "../constants";
+import { CustomerType } from "../schema";
 import { getBearerToken } from "../utils";
 
 export async function verifyCustomer(nationalityId: string) {
@@ -21,7 +22,7 @@ export async function verifyCustomer(nationalityId: string) {
 export async function getQuota(
   nationalityId: string,
   encryptedFamilyId: string,
-  customerType: string
+  customerType: CustomerType
 ) {
   const bearerToken = await getBearerToken();
 

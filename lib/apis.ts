@@ -1,4 +1,5 @@
 import { BASE_ENDPOINT } from "./constants";
+import { CustomerType } from "./schema";
 import { getBearerToken } from "./utils";
 
 export async function login(identifier: string, pin: string) {
@@ -16,7 +17,7 @@ export async function login(identifier: string, pin: string) {
 export async function verifyCustomer(nationalityId: string) {
   const bearerToken = await getBearerToken();
 
-  const res = await fetch(`${BASE_ENDPOINT}/api/verification`, {
+  const res = await fetch(`${BASE_ENDPOINT}/api/customers/verify`, {
     method: "POST",
     body: JSON.stringify({ nationalityId }),
     headers: {
@@ -31,7 +32,7 @@ export async function verifyCustomer(nationalityId: string) {
 export async function getQuota(
   nationalityId: string,
   encryptedFamilyId: string,
-  customerType: string
+  customerType: CustomerType
 ) {
   const bearerToken = await getBearerToken();
 

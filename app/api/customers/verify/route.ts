@@ -1,21 +1,19 @@
 import { NextRequest } from "next/server";
 import z from "zod/v4";
 
-import { verificationResponseToCustomer } from "../../../lib/dto";
-import { verifyCustomer } from "../../../lib/my-pertamina/apis";
-import { verificationResponseSchema } from "../../../lib/my-pertamina/schema";
-import { withAuth } from "../../../middlewares/with-auth";
+import { verifyCustomerResponseToCustomer } from "../../../../lib/dto";
+import { verifyCustomer } from "../../../../lib/my-pertamina/apis";
+import { verifyCustomerResponseSchema } from "../../../../lib/my-pertamina/schema";
+import { nationalityIdSchema } from "../../../../lib/schema";
+import { withAuth } from "../../../../middlewares/with-auth";
 
-const verificationRequestSchema = z.object({
-  nationalityId: z.string().regex(/^\d{16}$/, {
-    message:
-      "Enter your 16‑digit National ID number—digits only, no spaces or letters.",
-  }),
+const verifyCustomerRequestSchema = z.object({
+  nationalityId: nationalityIdSchema,
 });
 
 async function secretPOST(req: NextRequest) {
   const reqBody = await req.json();
-  const parsedReqBody = verificationRequestSchema.safeParse(reqBody);
+  const parsedReqBody = verifyCustomerRequestSchema.safeParse(reqBody);
 
   if (parsedReqBody.error) {
     return new Response(
@@ -49,7 +47,7 @@ async function secretPOST(req: NextRequest) {
   }
 
   const resBody = await res.json();
-  const parsedResBody = verificationResponseSchema.safeParse(resBody);
+  const parsedResBody = verifyCustomerResponseSchema.safeParse(resBody);
 
   if (parsedResBody.error) {
     return new Response(
@@ -63,7 +61,7 @@ async function secretPOST(req: NextRequest) {
     );
   }
 
-  const customer = verificationResponseToCustomer(
+  const customer = verifyCustomerResponseToCustomer(
     parsedResBody.data,
     nationalityId
   );

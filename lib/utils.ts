@@ -11,3 +11,7 @@ export async function getBearerToken() {
 
   return bearerToken;
 }
+
+export async function wait(duration: number) {
+  return new Promise((resolve) => setTimeout(resolve, duration));
+}

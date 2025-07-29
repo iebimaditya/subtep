@@ -3,12 +3,13 @@ import z from "zod/v4";
 import { getQuotaResponseToQuota } from "../../../lib/dto";
 import { getQuota } from "../../../lib/my-pertamina/apis";
 import { getQuotaResponseSchema } from "../../../lib/my-pertamina/schema";
+import { customerTypeSchema, nationalityIdSchema } from "../../../lib/schema";
 import { withAuth } from "../../../middlewares/with-auth";
 
 const getQuotaRequestSchema = z.object({
-  nationalityId: z.string(),
+  nationalityId: nationalityIdSchema,
   encryptedFamilyId: z.string(),
-  customerType: z.string(),
+  customerType: customerTypeSchema,
 });
 
 async function secretPOST(req: Request) {
