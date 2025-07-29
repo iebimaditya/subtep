@@ -29,6 +29,14 @@ export const customerWithQuotaSchema = customerSchema
   .omit({ types: true })
   .extend({ type: customerTypeSchema, quota: quotaSchema });
 
+export const transactionSChema = z.object({
+  id: z.string(),
+  nationalityId: nationalityIdSchema,
+  name: z.string(),
+  type: customerTypeSchema,
+  total: quotaSchema,
+});
+
 export const nationalityIdsFileSchema = z.array(nationalityIdSchema);
 export const customersWithQuotaFileSchema = z.array(customerWithQuotaSchema);
 
@@ -45,3 +53,4 @@ export const getQuotaResponseSchema = z.object({
 export type CustomerType = z.infer<typeof customerTypeSchema>;
 export type Customer = z.infer<typeof customerSchema>;
 export type CustomerWithQuota = z.infer<typeof customerWithQuotaSchema>;
+export type Transaction = z.infer<typeof transactionSChema>;

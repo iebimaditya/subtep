@@ -79,8 +79,33 @@ export const getQuotaResponseSchema = createResponseSchema(
   })
 );
 
+const summaryReportItemSchema = z.object({
+  sold: z.number(),
+  modal: z.number(),
+  profit: z.number(),
+  incomeMyptm: z.number(),
+});
+
+const customerReportItemSchema = z.object({
+  customerReportId: z.string(),
+  nationalityId: z.string(),
+  name: z.string(),
+  categories: z.array(customerTypeNameSchema),
+  total: z.number(),
+});
+
+export const getTransactionsResponseSchema = createResponseSchema(
+  z.object({
+    summaryReport: z.array(summaryReportItemSchema),
+    customersReport: z.array(customerReportItemSchema),
+  })
+);
+
 export type LoginResponse = z.infer<typeof loginResponseSchema>;
 export type VerifyCustomerResponse = z.infer<
   typeof verifyCustomerResponseSchema
 >;
 export type GetQuotaResponse = z.infer<typeof getQuotaResponseSchema>;
+export type GetTransactionsResponse = z.infer<
+  typeof getTransactionsResponseSchema
+>;

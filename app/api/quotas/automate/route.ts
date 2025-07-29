@@ -20,7 +20,7 @@ async function secretPOST() {
   );
 
   const batches = createBatchOfNationalityIds(nationalityIds);
-  const flattenedCustomers: CustomerWithQuota[] = [];
+  const flattenedCustomersWithQuota: CustomerWithQuota[] = [];
 
   for (const batch of batches) {
     const batchedCustomersWithQuota: CustomerWithQuota[] = [];
@@ -33,10 +33,10 @@ async function secretPOST() {
       batchedCustomersWithQuota.push(customerWithQuota);
     }
 
-    flattenedCustomers.push(...batchedCustomersWithQuota);
+    flattenedCustomersWithQuota.push(...batchedCustomersWithQuota);
 
     const customersWithQuota = await getFile(
-      "customers.json",
+      "customers-with-quota.json",
       customersWithQuotaFileSchema
     );
     await writeFile("customers.json", [
@@ -46,12 +46,15 @@ async function secretPOST() {
     await wait(TIMEOUT_THRESHOLD);
   }
 
-  return new Response(JSON.stringify({ customers: flattenedCustomers }), {
-    status: 200,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  return new Response(
+    JSON.stringify({ customersWithQuota: flattenedCustomersWithQuota }),
+    {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
 }
 
 export const POST = withAuth(secretPOST);

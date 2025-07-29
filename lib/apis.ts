@@ -47,3 +47,20 @@ export async function getQuota(
 
   return res;
 }
+
+export async function getTransactions(startDate: string, endDate: string) {
+  const bearerToken = await getBearerToken();
+
+  const res = await fetch(
+    `${BASE_ENDPOINT}/api/transactions?startDate=${startDate}&endDate=${endDate}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${bearerToken}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  return res;
+}

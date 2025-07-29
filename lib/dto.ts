@@ -1,9 +1,10 @@
 import {
   GetQuotaResponse,
+  GetTransactionsResponse,
   LoginResponse,
   VerifyCustomerResponse,
 } from "./my-pertamina/schema";
-import { Customer, CustomerType } from "./schema";
+import { Customer, CustomerType, Transaction } from "./schema";
 
 export function loginResponseToAccessToken({ data }: LoginResponse): string {
   return data.accessToken;
@@ -28,4 +29,16 @@ export function verifyCustomerResponseToCustomer(
 
 export function getQuotaResponseToQuota({ data }: GetQuotaResponse): number {
   return data.quotaRemaining.daily;
+}
+
+export function getTransactionsToTransactions({
+  data,
+}: GetTransactionsResponse): Transaction[] {
+  return data.customersReport.map((customerReport) => ({
+    id: customerReport.customerReportId,
+    nationalityId: customerReport.nationalityId,
+    name: customerReport.name,
+    type: customerReport.categories[0],
+    total: customerReport.total,
+  }));
 }

@@ -41,3 +41,20 @@ export async function getQuota(
 
   return res;
 }
+
+export async function getTransactions(startDate: string, endDate: string) {
+  const bearerToken = await getBearerToken();
+
+  const res = await fetch(
+    `${MY_PERTAMINA_ENDPOINT}/general/v1/transactions/report?startDate=${startDate}&endDate=${endDate}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${bearerToken}`,
+        "Content-Type": "application/json ",
+      },
+    }
+  );
+
+  return res;
+}
