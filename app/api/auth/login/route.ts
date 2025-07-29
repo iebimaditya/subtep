@@ -1,6 +1,7 @@
 import z from "zod/v4";
 
 import { closeBrowser, createBrowser } from "../../../../lib/browser";
+import { loginResponseToAccessToken } from "../../../../lib/dto";
 import {
   fillIdentifier,
   fillPin,
@@ -9,7 +10,6 @@ import {
   waitForLoginResponse,
 } from "../../../../lib/helpers/login.helper";
 import { loginResponseSchema } from "../../../../lib/my-pertamina/schema";
-import { loginResponseToAccessToken } from "../../../../lib/dto";
 
 export const loginRequestSchema = z.object({
   identifier: z.union([
@@ -35,6 +35,9 @@ export async function POST(req: Request) {
       JSON.stringify({ error: parsedReqBody.error.issues[0].message }),
       {
         status: 400,
+        headers: {
+          "Content-Type": "application/json",
+        },
       }
     );
   }
@@ -56,7 +59,12 @@ export async function POST(req: Request) {
         error:
           "We couldn’t process your login. Please try again or contact support if the issue persists.",
       }),
-      { status: waitedRes.status() }
+      {
+        status: waitedRes.status(),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
     );
   }
 
@@ -67,7 +75,10 @@ export async function POST(req: Request) {
     return new Response(
       JSON.stringify({ error: parsedResBody.error.issues[0].message }),
       {
-        status: 400,
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+        },
       }
     );
   }
@@ -76,5 +87,10 @@ export async function POST(req: Request) {
 
   await closeBrowser(browser);
 
-  return new Response(JSON.stringify({ accessToken }));
+  return new Response(JSON.stringify({ accessToken }), {
+    status: 200,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 }

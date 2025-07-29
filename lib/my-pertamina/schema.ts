@@ -33,4 +33,38 @@ export const loginResponseSchema = createResponseSchema(
   })
 );
 
+const customerTypeSchema = z.object({
+  name: z.string(),
+  sourceTypeId: z.number(),
+  status: z.number(),
+  verifications: z.array(z.unknown()),
+  merchant: z.any().nullable(),
+  isBlocked: z.boolean(),
+  isQuotaValid: z.boolean(),
+  registeredAt: z.string(),
+});
+
+export const verificationResponseSchema = createResponseSchema(
+  z.object({
+    nationalityId: z.string(),
+    familyId: z.string(),
+    familyIdEncrypted: z.string(),
+    name: z.string(),
+    email: z.string(),
+    phoneNumber: z.string(),
+    customerTypes: z.array(customerTypeSchema),
+    channelInject: z.string(),
+    isAgreedTermsConditions: z.boolean(),
+    isCompleted: z.boolean(),
+    isSubsidi: z.boolean(),
+    isRecommendationLetter: z.boolean(),
+    isBlocked: z.boolean(),
+    isBusinessType: z.boolean(),
+    isBusinessName: z.boolean(),
+    token: z.string(),
+    countDownTime: z.number(),
+  })
+);
+
 export type LoginResponse = z.infer<typeof loginResponseSchema>;
+export type VerificationResponse = z.infer<typeof verificationResponseSchema>;

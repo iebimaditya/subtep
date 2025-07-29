@@ -1,7 +1,7 @@
 import { Browser, firefox } from "@playwright/test";
 
 export async function createBrowser() {
-  const browser = await firefox.launch({ headless: false, args: ["--kiosk"] });
+  const browser = await firefox.launch({ headless: true, args: ["--kiosk"] });
   const context = await browser.newContext();
   const page = await context.newPage();
 
