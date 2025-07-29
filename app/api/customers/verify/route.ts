@@ -1,48 +1,28 @@
 import { NextRequest } from "next/server";
-import z from "zod/v4";
 
 import { verifyCustomerResponseToCustomer } from "../../../../lib/dto";
 import { verifyCustomer } from "../../../../lib/my-pertamina/apis";
 import { verifyCustomerResponseSchema } from "../../../../lib/my-pertamina/schema";
-import { nationalityIdSchema } from "../../../../lib/schema";
+import { verifyCustomerRequestSchema } from "../../../../lib/schema";
+import { errorResponse, successResponse } from "../../../../lib/utils";
 import { withAuth } from "../../../../middlewares/with-auth";
-
-const verifyCustomerRequestSchema = z.object({
-  nationalityId: nationalityIdSchema,
-});
 
 async function secretPOST(req: NextRequest) {
   const reqBody = await req.json();
-  const parsedReqBody = verifyCustomerRequestSchema.safeParse(reqBody);
+  const parsedReq = verifyCustomerRequestSchema.safeParse(reqBody);
 
-  if (parsedReqBody.error) {
-    return new Response(
-      JSON.stringify({ error: parsedReqBody.error.issues[0].message }),
-      {
-        status: 400,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+  if (parsedReq.error) {
+    return errorResponse(parsedReq.error.issues[0].message, 400);
   }
 
-  const { nationalityId } = parsedReqBody.data;
+  const { nationalityId } = parsedReq.data;
 
   const res = await verifyCustomer(nationalityId);
 
   if (!res.ok) {
-    return new Response(
-      JSON.stringify({
-        error:
-          "We couldn’t verify your ID just now. Please check the number and try again, or contact support if this keeps happening.",
-      }),
-      {
-        status: res.status,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
+    return errorResponse(
+      "We couldn’t verify your ID just now. Please check the number and try again, or contact support if this keeps happening.",
+      res.status
     );
   }
 
@@ -50,15 +30,7 @@ async function secretPOST(req: NextRequest) {
   const parsedResBody = verifyCustomerResponseSchema.safeParse(resBody);
 
   if (parsedResBody.error) {
-    return new Response(
-      JSON.stringify({ error: parsedResBody.error.issues[0].message }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    return errorResponse(parsedResBody.error.issues[0].message, 500);
   }
 
   const customer = verifyCustomerResponseToCustomer(
@@ -66,12 +38,7 @@ async function secretPOST(req: NextRequest) {
     nationalityId
   );
 
-  return new Response(JSON.stringify({ customer }), {
-    status: 200,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  return successResponse({ customer });
 }
 
 export const POST = withAuth(secretPOST);

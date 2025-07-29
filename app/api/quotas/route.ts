@@ -1,31 +1,16 @@
-import z from "zod/v4";
-
 import { getQuotaResponseToQuota } from "../../../lib/dto";
 import { getQuota } from "../../../lib/my-pertamina/apis";
 import { getQuotaResponseSchema } from "../../../lib/my-pertamina/schema";
-import { customerTypeSchema, nationalityIdSchema } from "../../../lib/schema";
+import { getQuotaRequestSchema } from "../../../lib/schema";
+import { errorResponse, successResponse } from "../../../lib/utils";
 import { withAuth } from "../../../middlewares/with-auth";
-
-const getQuotaRequestSchema = z.object({
-  nationalityId: nationalityIdSchema,
-  encryptedFamilyId: z.string(),
-  customerType: customerTypeSchema,
-});
 
 async function secretPOST(req: Request) {
   const reqBody = await req.json();
   const parsedReqBody = getQuotaRequestSchema.safeParse(reqBody);
 
   if (parsedReqBody.error) {
-    return new Response(
-      JSON.stringify({ error: parsedReqBody.error.issues[0].message }),
-      {
-        status: 400,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    return errorResponse(parsedReqBody.error.issues[0].message, 400);
   }
 
   const { nationalityId, encryptedFamilyId, customerType } = parsedReqBody.data;
@@ -33,43 +18,22 @@ async function secretPOST(req: Request) {
   const res = await getQuota(nationalityId, encryptedFamilyId, customerType);
 
   if (!res.ok) {
-    return new Response(
-      JSON.stringify({
-        error:
-          "We couldn’t retrieve your quota just now. Please try again shortly—or contact support if the issue persists.",
-      }),
-      {
-        status: res.status,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
+    return errorResponse(
+      "We couldn’t retrieve your quota just now. Please try again shortly—or contact support if the issue persists.",
+      res.status
     );
   }
 
   const resBody = await res.json();
-  const parsedResBody = getQuotaResponseSchema.safeParse(resBody);
+  const parsedRes = getQuotaResponseSchema.safeParse(resBody);
 
-  if (parsedResBody.error) {
-    return new Response(
-      JSON.stringify({ error: parsedResBody.error.issues[0].message }),
-      {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+  if (parsedRes.error) {
+    return errorResponse(parsedRes.error.issues[0].message, 500);
   }
 
-  const quota = getQuotaResponseToQuota(parsedResBody.data);
+  const quota = getQuotaResponseToQuota(parsedRes.data);
 
-  return new Response(JSON.stringify({ nationalityId, customerType, quota }), {
-    status: 200,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  return successResponse({ nationalityId, customerType, quota });
 }
 
 export const POST = withAuth(secretPOST);

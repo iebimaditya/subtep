@@ -40,6 +40,36 @@ export const transactionSChema = z.object({
 export const nationalityIdsFileSchema = z.array(nationalityIdSchema);
 export const customersWithQuotaFileSchema = z.array(customerWithQuotaSchema);
 
+export const loginRequestSchema = z.object({
+  identifier: z.union([
+    z.email({
+      error: "Please enter a valid email address—like name@example.com.",
+    }),
+    z.string().regex(/^((?:\+62|62)|0)8[1-9][0-9]{6,10}$/, {
+      error:
+        "Must be a valid Indonesian mobile phone number, e.g. 081234567890 or +6281234567890.",
+    }),
+  ]),
+  pin: z.string().regex(/^\d{6}$/, {
+    error: "Please enter exactly six digits (0–9), like 123456.",
+  }),
+});
+
+export const verifyCustomerRequestSchema = z.object({
+  nationalityId: nationalityIdSchema,
+});
+
+export const getQuotaRequestSchema = z.object({
+  nationalityId: nationalityIdSchema,
+  encryptedFamilyId: z.string(),
+  customerType: customerTypeSchema,
+});
+
+export const getTransactionsRequestSchema = z.object({
+  startDate: z.iso.date(),
+  endDate: z.iso.date(),
+});
+
 export const verifyCustomerResponseSchema = z.object({
   customer: customerSchema,
 });

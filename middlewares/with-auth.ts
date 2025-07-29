@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 
-import { getBearerToken } from "../lib/utils";
+import { errorResponse, getBearerToken } from "../lib/utils";
 
 export type Handler = (
   req: NextRequest,
@@ -12,17 +12,9 @@ export function withAuth(handler: Handler): Handler {
     const bearerToken = await getBearerToken();
 
     if (!bearerToken) {
-      return new Response(
-        JSON.stringify({
-          error:
-            "You’re not signed in—or your session has expired. Please sign in again to continue.",
-        }),
-        {
-          status: 401,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+      return errorResponse(
+        "You’re not signed in—or your session has expired. Please sign in again to continue.",
+        401
       );
     }
 

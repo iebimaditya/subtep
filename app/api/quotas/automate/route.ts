@@ -10,7 +10,7 @@ import {
   CustomerWithQuota,
   nationalityIdsFileSchema,
 } from "../../../../lib/schema";
-import { wait } from "../../../../lib/utils";
+import { successResponse, wait } from "../../../../lib/utils";
 import { withAuth } from "../../../../middlewares/with-auth";
 
 async function secretPOST() {
@@ -46,15 +46,7 @@ async function secretPOST() {
     await wait(TIMEOUT_THRESHOLD);
   }
 
-  return new Response(
-    JSON.stringify({ customersWithQuota: flattenedCustomersWithQuota }),
-    {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
+  return successResponse({ customersWithQuota: flattenedCustomersWithQuota });
 }
 
 export const POST = withAuth(secretPOST);
