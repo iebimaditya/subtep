@@ -1,30 +1,44 @@
-import fs from "fs";
-import path from "path";
-import z from "zod/v4";
+import { Page } from "@playwright/test";
 
-import { getQuota, verifyCustomer } from "../apis";
+import { getQuota, verifyCustomer } from "./apis";
+import { MY_PERTAMINA_ENDPOINT, MY_PERTAMINA_URL } from "./constants";
 import {
   CustomerWithQuota,
   getQuotaResponseSchema,
+  Transaction,
   verifyCustomerResponseSchema,
-} from "../schema";
+} from "./schema";
 
-export async function getFile<T extends z.ZodTypeAny>(
-  filename: string,
-  schema: T
+export async function gotoLoginPage(
+  page: Page,
+  options?: Parameters<typeof page.goto>[1]
 ) {
-  const filePath = path.join(process.cwd(), "private", "data", filename);
-
-  const file = await fs.promises.readFile(filePath, "utf8");
-  const parsedFile = schema.parse(JSON.parse(file));
-
-  return parsedFile;
+  await page.goto(`${MY_PERTAMINA_URL}/merchant-login`, options);
 }
 
-export async function writeFile(filename: string, data: any) {
-  const filePath = path.join(process.cwd(), "private", "data", filename);
+export async function fillIdentifier(page: Page, identifier: string) {
+  await page.locator("#mantine-r0").fill(identifier);
+}
 
-  await fs.promises.writeFile(filePath, JSON.stringify(data, null, 2));
+export async function fillPin(page: Page, pin: string) {
+  await page.locator("#mantine-r1").fill(pin);
+}
+
+export async function submitLoginForm(page: Page) {
+  await page.locator("button[type='submit']").click();
+}
+
+export async function waitForLoginResponse(page: Page) {
+  const waitedRes = await page.waitForResponse((res) => {
+    const req = res.request();
+
+    return (
+      req.method() === "POST" &&
+      req.url() === `${MY_PERTAMINA_ENDPOINT}/subuser/v1/login`
+    );
+  });
+
+  return waitedRes;
 }
 
 export function createBatchOfNationalityIds(
@@ -98,4 +112,19 @@ export async function getCustomerWithQuota(
     type: customerType,
     quota,
   };
+}
+
+export function getValidCustomersWithQuota(
+  customersWithQuota: CustomerWithQuota[]
+) {
+  return customersWithQuota.filter(
+    (customerWithQuota) => customerWithQuota.quota > 0
+  );
+}
+
+export function getExceedTransactions(
+  transactions: Transaction[],
+  max: number = 5
+) {
+  return transactions.filter((transaction) => transaction.total > max);
 }

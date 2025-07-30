@@ -2,20 +2,24 @@ import { TIMEOUT_THRESHOLD } from "../../../../lib/constants";
 import {
   createBatchOfNationalityIds,
   getCustomerWithQuota,
-  getFile,
-  writeFile,
-} from "../../../../lib/helpers/automate.helpers";
+  getValidCustomersWithQuota,
+} from "../../../../lib/helpers";
 import {
   customersWithQuotaFileSchema,
   CustomerWithQuota,
   nationalityIdsFileSchema,
 } from "../../../../lib/schema";
-import { successResponse, wait } from "../../../../lib/utils";
+import {
+  getFile,
+  successResponse,
+  wait,
+  writeFile,
+} from "../../../../lib/utils";
 import { withAuth } from "../../../../middlewares/with-auth";
 
 async function secretPOST() {
   const nationalityIds = await getFile(
-    "nationality-ids.json",
+    "private/data/nationality-ids.json",
     nationalityIdsFileSchema
   );
 
@@ -36,13 +40,21 @@ async function secretPOST() {
     flattenedCustomersWithQuota.push(...batchedCustomersWithQuota);
 
     const customersWithQuota = await getFile(
-      "customers-with-quota.json",
+      "private/data/customers-with-quota.json",
       customersWithQuotaFileSchema
     );
-    await writeFile("customers.json", [
+    await writeFile("private/data/customers-with-quota.json", [
       ...customersWithQuota,
       ...batchedCustomersWithQuota,
     ]);
+
+    const validCustomersWithQuota =
+      getValidCustomersWithQuota(customersWithQuota);
+    await writeFile(
+      "private/data/valid-customers-with-quota.json",
+      validCustomersWithQuota
+    );
+
     await wait(TIMEOUT_THRESHOLD);
   }
 

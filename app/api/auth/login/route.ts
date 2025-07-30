@@ -6,7 +6,7 @@ import {
   gotoLoginPage,
   submitLoginForm,
   waitForLoginResponse,
-} from "../../../../lib/helpers/login.helper";
+} from "../../../../lib/helpers";
 import { loginResponseSchema } from "../../../../lib/my-pertamina/schema";
 import { loginRequestSchema } from "../../../../lib/schema";
 import { errorResponse, successResponse } from "../../../../lib/utils";
@@ -38,13 +38,13 @@ export async function POST(req: Request) {
   }
 
   const resBody = await res.json();
-  const parsedResBody = loginResponseSchema.safeParse(resBody);
+  const parsedRes = loginResponseSchema.safeParse(resBody);
 
-  if (parsedResBody.error) {
-    return errorResponse(parsedResBody.error.issues[0].message, 500);
+  if (parsedRes.error) {
+    return errorResponse(parsedRes.error.issues[0].message, 500);
   }
 
-  const accessToken = loginResponseToAccessToken(parsedResBody.data);
+  const accessToken = loginResponseToAccessToken(parsedRes.data);
 
   await closeBrowser(browser);
 

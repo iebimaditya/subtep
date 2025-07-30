@@ -34,11 +34,11 @@ export function getQuotaResponseToQuota({ data }: GetQuotaResponse): number {
 export function getTransactionsToTransactions({
   data,
 }: GetTransactionsResponse): Transaction[] {
-  return data.customersReport.map((cr) => ({
-    id: cr.customerReportId,
-    nationalityId: cr.nationalityId,
-    name: cr.name,
-    type: cr.categories[0],
-    total: cr.total,
+  return data.customersReport.map((customerReport) => ({
+    id: customerReport.customerReportId,
+    nationalityId: customerReport.nationalityId,
+    name: customerReport.name,
+    type: customerReport.categories[0],
+    total: customerReport.total,
   }));
 }

@@ -1,10 +1,11 @@
 import { NextRequest } from "next/server";
 
 import { getTransactionsToTransactions } from "../../../lib/dto";
+import { getExceedTransactions } from "../../../lib/helpers";
 import { getTransactions } from "../../../lib/my-pertamina/apis";
 import { getTransactionsResponseSchema } from "../../../lib/my-pertamina/schema";
 import { getTransactionsRequestSchema } from "../../../lib/schema";
-import { errorResponse, successResponse } from "../../../lib/utils";
+import { errorResponse, successResponse, writeFile } from "../../../lib/utils";
 import { withAuth } from "../../../middlewares/with-auth";
 
 async function secretGET(request: NextRequest) {
@@ -39,6 +40,10 @@ async function secretGET(request: NextRequest) {
   }
 
   const transactions = getTransactionsToTransactions(parsedRes.data);
+  await writeFile("private/data/transactions.json", transactions);
+
+  const exceedTransactions = getExceedTransactions(transactions);
+  await writeFile("private/data/exceed-transactions.json", exceedTransactions);
 
   return successResponse({ transactions });
 }

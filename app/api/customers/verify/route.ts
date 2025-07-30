@@ -27,14 +27,14 @@ async function secretPOST(req: NextRequest) {
   }
 
   const resBody = await res.json();
-  const parsedResBody = verifyCustomerResponseSchema.safeParse(resBody);
+  const parsedRes = verifyCustomerResponseSchema.safeParse(resBody);
 
-  if (parsedResBody.error) {
-    return errorResponse(parsedResBody.error.issues[0].message, 500);
+  if (parsedRes.error) {
+    return errorResponse(parsedRes.error.issues[0].message, 500);
   }
 
   const customer = verifyCustomerResponseToCustomer(
-    parsedResBody.data,
+    parsedRes.data,
     nationalityId
   );
 

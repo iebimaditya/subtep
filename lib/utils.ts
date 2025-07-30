@@ -1,4 +1,7 @@
+import fs from "fs";
 import { headers } from "next/headers";
+import path from "path";
+import z from "zod/v4";
 
 export async function getBearerToken() {
   const reqHeaders = await headers();
@@ -32,4 +35,22 @@ export function successResponse(data: any, status: number = 200) {
       "Content-Type": "application/json",
     },
   });
+}
+
+export async function getFile<T extends z.ZodTypeAny>(
+  filename: string,
+  schema: T
+) {
+  const filePath = path.join(process.cwd(), filename);
+
+  const file = await fs.promises.readFile(filePath, "utf8");
+  const parsedFile = schema.parse(JSON.parse(file));
+
+  return parsedFile;
+}
+
+export async function writeFile(filename: string, data: any) {
+  const filePath = path.join(process.cwd(), filename);
+
+  await fs.promises.writeFile(filePath, JSON.stringify(data, null, 2));
 }
